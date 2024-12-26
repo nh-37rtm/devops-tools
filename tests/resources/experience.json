@@ -1,0 +1,18 @@
+{
+    "client": "Enedis",
+    "presentation": "pres",
+    "detailsMemory": "dsdsf",
+    "dateDebut": "2023-05-01",
+    "dateFin": "2024-02-02",
+    "intitule": "c'est l'intitulé",
+    "references" : "sdfdsf",
+    "domaine": "devops",
+    "domaines": [ "domaine1", "domaine2"],
+    "environnementTechnique": "environnement technique",
+    "realisations": [
+        {
+            "description": "Normes sur la mise en place d’une architecture REST utilisant les hyperliens (ou HATEOS)",
+            "text" : "tests pour faire de l'HATEOS et anticipation sur la possible migration vers une architecture HATEOS"
+        }
+    ]
+}

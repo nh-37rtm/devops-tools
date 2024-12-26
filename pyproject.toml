@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "devops-tools"
+version = "0.1.0"
+description = "devops tools mostly in python, with tests examples"
+authors = ["Nicolas Heim"]
+readme = "README.md"
+
+packages = [
+    { include = "**", from = "./src", to = "devops-tools" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.10.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
