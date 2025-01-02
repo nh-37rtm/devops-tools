@@ -108,4 +108,6 @@ def test_map_list(logger: logging.Logger, source_data_list: dict):
 
     
     result = m.deep_map_from_raw_(source_data_list, t.List[ClassA])
+    logging.info(result)
+    
     pass

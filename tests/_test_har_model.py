@@ -1,12 +1,7 @@
 
 import pydantic.parse
-from jinja_cv.models.base_models import (
-    Experience, 
-    JExperience, 
-    JsonObject, 
-    JExperienceList, 
-    VExperience,
-    deep_map_from_raw)
+
+from src.models.har_models import deep_map_from_raw
 
 
 from pytest import fixture
@@ -28,11 +23,9 @@ from jsonpath_ng import parse
 
 from tests.resources.sii.models import SiiExperience, SiiCv
 
-from jinja_cv.controler import controler as JinjaCvControler
+from src.models import controler as JinjaCvControler
 
-from jinja_cv.generate import RenderContext
-
-from jinja_cv.models.har_models import IHarFileRequest
+from src.models.har_models import IHarFileRequest
 
 @fixture(name="async_loop")
 def fix1() -> asyncio.AbstractEventLoop:
