@@ -116,7 +116,13 @@ def dict_source_map(node: MapNode,
 
         for key, value in node.source.items():
 
-            key_type, value_type = t.get_args(node.destination_type)
+                        
+            typing_args = t.get_args(node.destination_type)
+            
+            if len(typing_args) == 2 :
+                key_type, value_type = t.get_args(node.destination_type)
+            else:
+                value_type = dict
                         
             logging.debug(f"mapping attribute of type {value_type} ...")
             
