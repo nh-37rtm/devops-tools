@@ -16,6 +16,7 @@ python = "^3.11"
 pydantic = "^2.10.3"
 python-dotenv = "^1.0.1"
 hvac = "^2.3.0"
+pydantic-partial = "^0.6.0"
 
 
 [tool.poetry.group.dev.dependencies]

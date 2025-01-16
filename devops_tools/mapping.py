@@ -74,9 +74,6 @@ def list_source_map(node: MapNode,
                 source=value, destination_type=current_list_type,
                 context=sub_context)
             
-            # sub_node.value = current_list_type()
-            
-            # current_list_node.append(sub_node.value)
             node.value = current_list_node
             
             node.context.current_queue.put(sub_node)
@@ -101,7 +98,63 @@ def list_source_map(node: MapNode,
 
             # sub_node.value = class_name()            
             node.context.current_queue.put(sub_node)
-                    
+
+
+def tuple_source_map(node: MapNode, 
+                    sub_context: MapNodeContext) -> None:
+    
+    origin_type = t.get_origin(node.destination_type)
+    
+    if origin_type is not None and \
+            issubclass(origin_type, tuple) :
+                
+        current_list_node: t.Tuple = tuple()
+                
+        logging.debug("mapping source list to origin list type ...")
+
+        arguments = t.get_args(node.destination_type)
+        
+        arguments_size = len(arguments)
+        
+        for current_argument_index in range(0, arguments_size):
+            
+            current_argument_value = node.source[current_argument_index]
+            current_argument_type = arguments[current_argument_index]
+            
+            logging.debug(f"mapping attribute of type {current_argument_type} (destination type hint) ...")
+            logging.debug(f"instanciating {current_argument_type} for deep reference...")
+
+            sub_node = MapNode(
+                source=current_argument_value, destination_type=current_argument_type,
+                context=sub_context)
+            
+            sub_node.context.parent_node = node
+            
+            node.value = current_list_node
+            node.context.current_queue.put(sub_node)
+            
+            
+        return
+            
+    if  inspect.isclass(node.destination_type) and \
+            issubclass(node.destination_type, list):
+    
+        logging.debug("untyped list to list mapping for node ...")
+        
+        for value in node.source:
+            
+            class_name = type(value)
+            logging.debug(f"mapping attribute of type {class_name} ...")
+            logging.debug(f"instanciating {class_name} for deep reference...")
+            # sub_context.reference = class_name()
+
+            sub_node = MapNode(
+                source=value, destination_type=class_name,
+                context=sub_context)
+
+            # sub_node.value = class_name()            
+            node.context.current_queue.put(sub_node)
+       
 
 def dict_source_map(node: MapNode, 
                     sub_context: MapNodeContext) -> None:
@@ -147,6 +200,7 @@ def dict_source_map(node: MapNode,
         for field_name, field in node.destination_type.__dataclass_fields__.items():
             # assert(field_name in source)
             if not field_name in node.source:
+                setattr(node.value, field_name, )
                 continue
 
             
@@ -174,6 +228,9 @@ def populate_parent(node: MapNode) -> None:
         node.context.parent_node.value.append( node.value )
         return
     
+    if issubclass( type(node.context.parent_node.value), tuple):
+        node.context.parent_node.value = node.context.parent_node.value + (node.value,)
+        return
 def walk_through(node: MapNode) -> None:
     
     sub_context = MapNodeContext(node.context.current_queue, node)
@@ -186,6 +243,10 @@ def walk_through(node: MapNode) -> None:
 
         if isinstance(node.source, dict) :      
             dict_source_map(node, sub_context)
+            break
+        
+        if isinstance(node.source, tuple) :      
+            tuple_source_map(node, sub_context)
             break
 
         # other types are not supported and affected as is
@@ -200,7 +261,7 @@ def map_node(node: MapNode) -> None:
 
     if is_optional(node.destination_type):
         node.context.current_queue.put(
-            MapNode(node.context, node.source, 
+            MapNode(node.context, node.source,
                 t.get_args(node.destination_type)[0],node.value, node.dict_key_source))
         
         return
@@ -208,7 +269,7 @@ def map_node(node: MapNode) -> None:
     walk_through(node)
 
 
-def deep_map_from_raw_(source: dict|list|tuple, destination_type: t.Type[T]) -> T:
+def deep_map_from_raw(source: dict|list|tuple, destination_type: t.Type[T]) -> T:
     node_queue = SimpleQueue[MapNode]()
     
     root_node = MapNode(
@@ -217,82 +278,9 @@ def deep_map_from_raw_(source: dict|list|tuple, destination_type: t.Type[T]) -> 
     
     node_queue.put(root_node)
     
-        
     while not node_queue.empty():
         
         current_node = node_queue.get()
         map_node(current_node)
     
     return root_node.value
-    
-
-def deep_map_from_raw(source: dict|list, destination_type: t.Type[T]) -> T:
-
-    if is_optional(destination_type):
-            return deep_map_from_raw(source, t.get_args(destination_type)[0])           
-    
-    common_destination_type = t.get_origin(destination_type)
-    is_generic_type = True
-    
-    if common_destination_type is None:
-        common_destination_type = destination_type
-        is_generic_type = False
-    
-    generic_args = None
-    
-    if is_generic_type:
-        generic_args = t.get_args(destination_type)
-            
-    while True:
-        
-        if issubclass( common_destination_type, list) and \
-            isinstance(source, list) :
-            
-            sub_destination_type: t.Type = list
-            
-            if is_generic_type and len(generic_args) > 0:
-                sub_destination_type, = generic_args
-                
-            return [
-                deep_map_from_raw(value, sub_destination_type) 
-                for value in source ]    
-                
-
-        if isinstance(source, dict) :
-            
-            destination_dict = source
-                
-            if issubclass( common_destination_type, dict):
-                sub_destination_value_type: t.Type = dict
-            
-                if is_generic_type and len(generic_args) > 0:
-                    _, sub_destination_value_type = generic_args
-                
-                return dict([
-                    (key, deep_map_from_raw(value, sub_destination_value_type))
-                    for key, value in destination_dict.items() ])
-
-            if is_dataclass( common_destination_type ):
-
-                result_dict = dict()
-                result_instance = None
-
-                for field_name, field in common_destination_type.__dataclass_fields__.items():
-                    # assert(field_name in source)
-                    if not field_name in source:
-                        continue
-
-                    destination_type = field.type
-
-                    result_dict[field_name] = deep_map_from_raw( source[field_name], destination_type)
-
-                    
-                    
-                result_instance = common_destination_type(**result_dict)
-                
-                return result_instance
-
-        # source type is not supported or final type : return as is
-        return source
-            
-        break
