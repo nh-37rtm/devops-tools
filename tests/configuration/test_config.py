@@ -10,14 +10,14 @@ import json
 #from HpiLogging import HpiLogger as logging
 import logging
 
-from configuration.config_file_loader import ConfigFileLoader
-from configuration.json_config_loader import JsonConfigFileLoader
-from configuration.env_config_loader import EnvConfigLoader
-from configuration.env_config_file_loader import EnvConfigFileLoader
-from configuration.composite_config_loader import CompositeConfigLoader
+from devops_tools.configuration.config_file_loader import ConfigFileLoader
+from devops_tools.configuration.json_config_loader import JsonConfigFileLoader
+from devops_tools.configuration.env_config_loader import EnvConfigLoader
+from devops_tools.configuration.env_config_file_loader import EnvConfigFileLoader
+from devops_tools.configuration.composite_config_loader import CompositeConfigLoader
 # from configuration.vault_config_loader import VaultConfigLoader, VaultConf
 
-from models.exceptions import DevopsException
+from devops_tools.models.exceptions import DevopsException
 
 from tests.configuration.sets.test_model import TestModel, TestEnvModel
 import typing as t

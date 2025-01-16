@@ -1,5 +1,5 @@
-from configuration.config_file_loader import ConfigFileLoader
-import src.utils as u
+from .config_file_loader import ConfigFileLoader
+import devops_tools.utils as u
 
 from typing import TypeVar, Type
 

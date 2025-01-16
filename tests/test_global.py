@@ -1,5 +1,5 @@
 from pytest import fixture
-import src.mapping as m
+import devops_tools.mapping as m
 import logging
 
 import typing as t

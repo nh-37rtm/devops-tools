@@ -1,8 +1,8 @@
-from configuration.config_file_loader import ConfigLoader
+from .config_file_loader import ConfigLoader
 from typing import TypeVar, Type, Tuple
-from logger import HpiLogger
+from devops_tools.logger import HpiLogger
 from queue import SimpleQueue
-from models.exceptions import DevopsException
+from devops_tools.models.exceptions import DevopsException
 # from configuration.vault_config_loader import VaultConfigLoader
 
 T = TypeVar('T')

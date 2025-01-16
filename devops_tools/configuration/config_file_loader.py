@@ -2,7 +2,7 @@ import logging
 import os
 from typing import Type, TypeVar
 
-from configuration.config_loader import ConfigLoader
+from .config_loader import ConfigLoader
 
 T = TypeVar('T')
 

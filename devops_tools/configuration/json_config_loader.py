@@ -1,4 +1,4 @@
-from configuration.config_file_loader import ConfigFileLoader
+from .config_file_loader import ConfigFileLoader
 import logging
 from typing import TypeVar, Type
 

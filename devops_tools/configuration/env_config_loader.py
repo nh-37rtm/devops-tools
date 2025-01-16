@@ -1,5 +1,5 @@
-from configuration.config_loader import ConfigLoader
-import src.utils as u
+from .config_loader import ConfigLoader
+import devops_tools.utils as u
 
 import logging
 from typing import TypeVar, Type
