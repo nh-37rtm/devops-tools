@@ -1,0 +1,8 @@
+{
+    "qualif/app/splunk_qualif": {
+            "ec_token": "ec_token_value",
+            "host": "https://qualif.mycompany.fr:8088/services/collector",
+            "index": "",
+            "source": "atlassian"
+        }
+}

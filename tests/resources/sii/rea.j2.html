@@ -1,0 +1,14 @@
+<li>
+    {{data.description}}.
+</li>
+
+
+{% if data.realisations|length > 0 %}
+<ul>
+
+    {% for realisation in data.realisations %}
+    {{ context.renderTemplate( 'rea.j2.html', realisation ) }}
+    {% endfor %}
+
+</ul>
+{% endif %}

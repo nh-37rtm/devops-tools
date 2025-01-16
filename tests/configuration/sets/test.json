@@ -1,0 +1,10 @@
+
+
+{
+    "an_array": [ "a", "b", "c" ],
+    "a_property" : "a_value",
+    "an_object": {
+        "object_property": "object_property_value"
+    }
+
+}

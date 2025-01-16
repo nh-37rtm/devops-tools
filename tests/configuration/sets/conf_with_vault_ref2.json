@@ -1,0 +1,32 @@
+{
+  "jira_url": "https://jira.mycompany.fr",
+  "jira_login": "",
+  "ec_jira_password": "",
+  "ec_jira_token": "jira_token",
+  "jira_fields": [
+    "comment",
+    "description",
+    "attachment"
+  ],
+  "confluence_url": "https://confluence.backup.mycompany.fr",
+  "confluence_login": "",
+  "ec_confluence_password": "",
+  "ec_confluence_token": "",
+  "splunk_infos": {
+    "host": "https://qualif.mycompany.fr:8088/services/collector",
+    "source": "atlassian",
+    "ec_token": "<qualif/app/splunk_qualif#ec_token>",
+    "index": ""
+  },
+  "context_size": "100",
+  "tag": "devops-atlassian",
+  "proxies_conf": {
+    "http": "",
+    "https": ""
+  },
+  "partial_scan": true,
+  "fetch_thread_count": 5,
+  "worker_thread_count": 3,
+  "fetch_projects_admin": true,
+  "show_thread_stats": true
+}
