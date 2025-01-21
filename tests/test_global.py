@@ -170,7 +170,6 @@ def test_map_tuple_2(logger: logging.Logger):
                                     "d_b":[ "A", "B", "C"] 
                                    },
                                    ), t.Tuple[str, str, ClassD])
-    pass
     logging.info(result)
 
     pass

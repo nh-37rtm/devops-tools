@@ -18,6 +18,8 @@ python-dotenv = "^1.0.1"
 hvac = "^2.3.0"
 pydantic-partial = "^0.6.0"
 
+[tool.black]
+line-length = 70
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
@@ -29,3 +31,4 @@ log_cli_level = "INFO"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
