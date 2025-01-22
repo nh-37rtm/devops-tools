@@ -29,6 +29,7 @@ class ClassD:
     d_a: t.Tuple[str, str, ClassB] = dataclasses.field(default=None)
     d_b: t.List[str] = dataclasses.field(default=None)
 
+
 @dataclass
 class ClassA:
 
@@ -98,9 +99,10 @@ def fix03() -> t.Tuple:
         },
     ]
 
+
 @fixture(name="list_test")
 def fix04() -> t.List:
-    return [ 1, 2, 3, ClassB()]
+    return [1, 2, 3, ClassB()]
 
 
 @fixture(name="source_data_list")
@@ -146,30 +148,39 @@ def test_map_list(logger: logging.Logger, source_data_list: dict):
 #     partial = create_partial_model(t.List[ClassA])
 #     test = partial.model_validate(source_data_list)
 
+
 def test_map_tuple(logger: logging.Logger, source_data2: dict):
     logger.info("starting tests ...")
 
     pass
     logger.info(source_data2)
 
-    result = m.deep_map_from_raw(source_data2, t.Tuple[str, str, ClassA])
+    result = m.deep_map_from_raw(
+        source_data2, t.Tuple[str, str, ClassA]
+    )
     pass
     logging.info(result)
 
     pass
 
 
-
 def test_map_tuple_2(logger: logging.Logger):
     logger.info("starting tests ...")
 
-    result = m.deep_map_from_raw( ("a", "b", 
-                                   
-                                   { 
-                                    "d_a":( "1", "2", { "b_a": "b_a" }), 
-                                    "d_b":[ "A", "B", "C"] 
-                                   },
-                                   ), t.Tuple[str, str, ClassD])
+    result = m.deep_map_from_raw(
+        (
+            "a",
+            "b",
+            {
+                "d_a": ("1", "2", {"b_a": "b_a"}),
+                "d_b": ["A", "B", "C"],
+            },
+        ),
+        t.Tuple[str, str, ClassD],
+    )
+    
+    a, b, c = result
+    
     logging.info(result)
 
     pass
