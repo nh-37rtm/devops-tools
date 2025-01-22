@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "devops_tools"
-version = "0.1.3"
+version = "0.1.4"
 description = "devops tools mostly in python, with tests examples"
 authors = ["Nicolas Heim"]
 readme = "README.md"
