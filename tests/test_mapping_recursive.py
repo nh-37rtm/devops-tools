@@ -1,10 +1,7 @@
 from pytest import fixture
-import devops_tools.mapping as m
-
 
 import devops_tools.mapping_recursive as mr
 import logging
-
 
 import typing as t
 
@@ -134,13 +131,13 @@ def test_map(logger: logging.Logger, source_data: dict):
 
     logger.info(source_data)
 
-    m.deep_map_from_raw(source_data, ClassA)
+    mr.type_wrap(source_data, ClassA)
 
 
 def test_map_dict(logger: logging.Logger, source_data: dict):
 
     logger.info("starting tests ...")
-    result = m.deep_map_from_raw({"a": "a_value"}, t.Dict)
+    result = mr.type_wrap({"a": "a_value"}, t.Dict)
 
     pass
 
@@ -150,19 +147,12 @@ def test_map_list(logger: logging.Logger, source_data_list: dict):
 
     logger.info(source_data_list)
 
-    result = m.deep_map_from_raw(source_data_list, t.List[ClassA])
+    result = mr.type_wrap(source_data_list, t.List[ClassA])
     logging.info(result)
 
+
+    
     pass
-
-
-# def test_pydantic_partial(logger: logging.Logger, source_data2: dict):
-
-#     logger.info("starting test ...")
-
-#     partial = create_partial_model(t.List[ClassA])
-#     test = partial.model_validate(source_data_list)
-
 
 def test_map_tuple(logger: logging.Logger, source_data2: dict):
     logger.info("starting tests ...")
@@ -170,34 +160,10 @@ def test_map_tuple(logger: logging.Logger, source_data2: dict):
     pass
     logger.info(source_data2)
 
-    result = m.deep_map_from_raw(
+    result = mr.type_wrap(
         source_data2, t.Tuple[str, str, ClassA]
     )
     pass
-    logging.info(result)
-
-    pass
-
-
-def test_map_tuple_2(logger: logging.Logger):
-    logger.info("starting tests ...")
-
-    result = m.deep_map_from_raw(
-        (
-            "a",
-            "b",
-            {
-                "d_a": ("1", "2", {"b_a": "b_a"}),
-                "d_b": ["A", "B", "C"],
-            },
-        ),
-        t.Tuple[str, str, ClassD],
-    )
-
-    a, b, c = result
-
-    logger.info(c.d_a)
-
     logging.info(result)
 
     pass
@@ -212,7 +178,7 @@ def test_basic(logger: logging.Logger):
 
 
 def test_type_map(logger: logging.Logger):
-    result = m.type_map(
+    result = mr.type_map(
         (
             "a",
             "b",
@@ -247,9 +213,6 @@ def test_dataclass(logger: logging.Logger):
     result = PostInitTest(**d)
     logger.info(result)
     pass
-
-
-
 
 def test_rec_map(logger: logging.Logger):
     logger.info("starting tests ...")
