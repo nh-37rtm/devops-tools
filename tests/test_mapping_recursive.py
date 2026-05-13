@@ -178,7 +178,7 @@ def test_basic(logger: logging.Logger):
 
 
 def test_type_map(logger: logging.Logger):
-    result = mr.type_map(
+    result = mr.type_wrap(
         (
             "a",
             "b",
@@ -192,7 +192,7 @@ def test_type_map(logger: logging.Logger):
 
     logger.info(result)
 
-    result = m.type_map(["a", "b", "c"], t.Tuple[str, str, str])
+    result = mr.type_wrap(["a", "b", "c"], t.Tuple[str, str, str])
     a, b, c = result
     pass
 

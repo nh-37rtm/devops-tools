@@ -13,4 +13,4 @@ logging.basicConfig(level=DEVOPS_LOG_LEVEL,
                     stream=sys.stderr,
                     format='%(asctime)s %(name)s %(levelname)-5s %(message)s')
 
-HpiLogger: logging.Logger = logging.getLogger('hpi')
+DevopsLogger: logging.Logger = logging.getLogger('hpi')

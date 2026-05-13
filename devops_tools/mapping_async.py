@@ -23,15 +23,10 @@ def is_generic(destination_type) -> True:
 
 
 @dataclass
-class MapReference(t.Generic[T]):
+class ImmutableMapReference(t.Generic[T]):
     value: T = field(default= None)
     def __repr__(self):
         return self.value
-    
-    def __getattribute__(self, name):
-        if name == 'value':
-            return self.__dict__['value']
-        return self.value.__getattribute__(name)
 
 
 @dataclass
@@ -46,7 +41,7 @@ class MapNode(t.Generic[T]):
     context: MapNodeContext[T]
     source: T
     destination_type: t.Type[T]
-    reference: MapReference|t.Any = None
+    reference: ImmutableMapReference|t.Any = None
     dict_key_source: t.Optional[str] = None
     set_reference: t.Callable = field(default=None)
 
@@ -67,7 +62,7 @@ def mk_reference(type: t.Type) -> t.Any:
         case _ if type_origin is not None : 
             match type_origin:
                 case _ if issubclass(type_origin, tuple):
-                    return_value = MapReference(tuple())
+                    return_value = ImmutableMapReference(tuple())
                 case _ if issubclass(type_origin, dict):
                     return_value = dict()
                 case _ if issubclass(type_origin, list):
@@ -75,7 +70,7 @@ def mk_reference(type: t.Type) -> t.Any:
         case _ if is_dataclass(type):
             return_value = type()
         case _:
-            return_value = MapReference(type())
+            return_value = ImmutableMapReference(type())
     return return_value
 
 
@@ -84,9 +79,6 @@ def map_list_as_list(
 ) -> None:
 
     logging.debug("mapping source list to origin list type ...")
-    
-    if node.reference.value is None :
-        node.reference.value = list()
 
     for value in node.source:
 
@@ -103,10 +95,10 @@ def map_list_as_list(
             source=value,
             destination_type=current_list_type,
             context=sub_context,
-            reference= MapReference()
+            reference= mk_reference(current_list_type)
         )        
         
-        node.reference.value.append(sub_node.reference)
+        node.reference.append(sub_node.reference)
         node.context.current_queue.put(sub_node)
 
 
@@ -115,9 +107,6 @@ def map_list_as_tuple(
 ) -> None:
 
     logging.debug("mapping source list to origin list type ...")
-    
-    if node.reference.value is None :
-        node.reference.value = tuple()
 
     arguments = t.get_args(node.destination_type)
     arguments_size = len(arguments)
@@ -140,7 +129,7 @@ def map_list_as_tuple(
             source=current_argument_value,
             destination_type=current_argument_type,
             context=sub_context,
-            reference= MapReference()
+            reference= mk_reference(current_argument_type)
         )
             
         node.reference.value = node.reference.value + (sub_node.reference,)
@@ -148,52 +137,11 @@ def map_list_as_tuple(
         # because of tuple immutability we use ImmutableMapReference
         # node.reference = tuple_reference
         node.context.current_queue.put(sub_node)
-        
-
-
-def map_untyped_list_to_list(
-    node: MapNode, sub_context: MapNodeContext
-) -> None:
-
-    if node.reference.value is None :
-        node.reference.value = list()
-
-    logging.debug("untyped list to list mapping for node ...")
-
-    for value in node.source:
-
-        value_type = None
-
-        typing_args = t.get_args(node.destination_type)
-        if len(typing_args) == 1:
-            value_type, = t.get_args(node.destination_type)
-        else:
-            value_type = dict
-
-        class_name = type(value)
-        logging.debug(f"mapping attribute of type {class_name} ...")
-        logging.debug(
-            f"instanciating {class_name} for deep reference..."
-        )
-
-        sub_node = MapNode(
-            source=value,
-            destination_type=class_name,
-            context=sub_context,
-            reference= MapReference()
-        )
-        
-        node.reference.value.append(sub_node.reference)
-        node.context.current_queue.put(sub_node)
 
 
 def map_dict_to_dict(
     node: MapNode, sub_context: MapNodeContext
 ) -> None:
-    
-    
-    if node.reference.value is None :
-        node.reference.value = dict()
 
     for key, value in node.source.items():
         
@@ -212,10 +160,10 @@ def map_dict_to_dict(
             destination_type=value_type,
             context=sub_context,
             dict_key_source=key,
-            reference= MapReference()
+            reference= mk_reference(value_type)
         )
         
-        node.reference.value[key] = sub_node.reference
+        node.reference[key] = sub_node.reference
 
         logging.debug(
             f"instanciating {value_type} for deep reference..."
@@ -226,10 +174,6 @@ def map_dict_to_dict(
 def map_dict_to_dataclass(
     node: MapNode, sub_context: MapNodeContext
 ) -> None:
-
-
-    if node.reference.value is None :
-        node.reference.value = node.destination_type()
 
     for (
         field_name,
@@ -245,10 +189,10 @@ def map_dict_to_dataclass(
             destination_type=field.type,
             context=sub_context,
             dict_key_source=field_name,
-            reference=MapReference()
+            reference=mk_reference(field.type)
         )
 
-        setattr(node.reference.value, field_name, sub_node.reference)
+        setattr(node.reference, field_name, sub_node.reference)
         node.context.current_queue.put(sub_node)
 
 
@@ -267,15 +211,8 @@ def list_mapping_dispatcher(
 
         case _ if destination_type_origin is not None and issubclass(
             destination_type_origin, tuple
-        ):
-            #assert isinstance( node.reference, ImmutableMapReference )            
+        ):       
             map_list_as_tuple(node, sub_context)
-
-        case _ if inspect.isclass(
-            node.destination_type
-        ) and issubclass(node.destination_type, list):
-
-            map_untyped_list_to_list(node, sub_context)
 
 
 def dict_mapping_dispatcher(
@@ -299,7 +236,7 @@ def dict_mapping_dispatcher(
 def walk_through(node: MapNode) -> None:
 
     sub_context = MapNodeContext(node.context.current_queue, node)
-    
+
     match node.source:
         case _ if isinstance(node.source, list):
             list_mapping_dispatcher(node, sub_context)
@@ -310,7 +247,7 @@ def walk_through(node: MapNode) -> None:
         case _ if isinstance(node.source, tuple):
             list_mapping_dispatcher(node, sub_context)
             
-        case _ if isinstance( node.reference, MapReference ):
+        case _ if isinstance( node.reference, ImmutableMapReference ):
                 logging.info(f"setting immutable reference value to {node.source}")
                 node.reference.value = node.source
         case _:
@@ -350,7 +287,7 @@ def deep_map_from_raw(
         context=MapNodeContext(
             current_queue=node_queue, parent_node=None
         ),
-        reference= MapReference()
+        reference= mk_reference(destination_type)
     )
 
     node_queue.put(root_node)
@@ -360,10 +297,4 @@ def deep_map_from_raw(
         current_node = node_queue.get()
         map_node(current_node)
 
-    return root_node.reference.value
-
-
-def type_map(
-    source: t.Any, destination_type: t.Type[T]
-) -> T:
-    return source
+    return root_node.reference

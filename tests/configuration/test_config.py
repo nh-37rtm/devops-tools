@@ -7,7 +7,7 @@ import sys
 from pydantic import ValidationError
 import json
 
-#from HpiLogging import HpiLogger as logging
+#from HpiLogging import DevopsLogger as logging
 import logging
 
 from devops_tools.configuration.config_file_loader import ConfigFileLoader

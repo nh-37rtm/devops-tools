@@ -1,6 +1,6 @@
 from .config_file_loader import ConfigLoader
 from typing import TypeVar, Type, Tuple
-from devops_tools.logger import HpiLogger
+from devops_tools.logger import DevopsLogger
 from queue import SimpleQueue
 from devops_tools.models.exceptions import DevopsException
 # from configuration.vault_config_loader import VaultConfigLoader
@@ -42,12 +42,12 @@ class CompositeConfigLoader(ConfigLoader[T]):
                 partial_config = loader.load_as_dict()
             except Exception as exception:
                 if self._continue_on_fail_loading:
-                    HpiLogger.exception(exception, exc_info=True)
+                    DevopsLogger.exception(exception, exc_info=True)
                     continue
                 else:
                     raise DevopsException(f'Error on initializing config loader {loader.__class__}', ) from exception
 
-            HpiLogger.info('composing configuration with %s loader ...', type(loader).__name__)
+            DevopsLogger.info('composing configuration with %s loader ...', type(loader).__name__)
 
             class QueueElementContext():
 
@@ -86,7 +86,7 @@ class CompositeConfigLoader(ConfigLoader[T]):
 
                         if key in ec.target:
 
-                            HpiLogger.warning(
+                            DevopsLogger.warning(
                                 'merge/override key : "%s" with the value from "%s" loader source!',
                                 '.'.join(path),
                                 type(loader).__name__)
@@ -106,14 +106,14 @@ class CompositeConfigLoader(ConfigLoader[T]):
                 else:
                     ec.target = ec.source
 
-            HpiLogger.debug('current composition result is : %s ', self._data_as_dict)
+            DevopsLogger.debug('current composition result is : %s ', self._data_as_dict)
 
         # if self._vault_conf_loader is not None:
         #     try:
-        #         HpiLogger.info('vault config loader exists, resolving vault placeholders ...')
+        #         DevopsLogger.info('vault config loader exists, resolving vault placeholders ...')
         #         self._data_as_dict = self._vault_conf_loader.retrieve_secrets_from_vault(self._data_as_dict)
         #     except Exception as exception:
-        #         HpiLogger.exception(exception, exc_info=True)
+        #         DevopsLogger.exception(exception, exc_info=True)
 
     
 
