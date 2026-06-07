@@ -1,4 +1,5 @@
 from os import environ
+from importlib import resources
 
 def env_vars_to_dict(
         _in: dict[str, str], 
@@ -31,3 +32,10 @@ def env_vars_to_dict(
             current_element_position+= 1
 
     return _out_map
+
+
+def get_resources_path() -> str:
+    """print the path to python resources folder
+    """
+    sysource = resources.files('devops_tools')
+    print(sysource)
