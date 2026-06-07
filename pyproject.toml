@@ -30,7 +30,7 @@ include-package-data = true
 dev = [
     "pylint", 
     "pytest",
-    # "jinja-templating[dev] @ file:///app/jinja-templating",
+    # "jinja-templating[dev] @ file:///opt/projects/jinja-templating",
 ]
 
 run = [
